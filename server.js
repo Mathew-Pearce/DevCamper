@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const logger = require('./middleware/logger.js');
+const morgan = require('morgan');
 
 //Route Files
 const bootcamps = require('./routes/bootcamps.js');
@@ -12,8 +13,10 @@ const PORT = process.env.PORT || 5000;
 
 const app = express();
 
-//use logger middleware
-app.use(logger);
+//Dev logging middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 //Routes
 //Mount Routers
