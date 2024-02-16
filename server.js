@@ -1,13 +1,16 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const logger = require('./middleware/logger.js');
 const morgan = require('morgan');
-
-//Route Files
-const bootcamps = require('./routes/bootcamps.js');
+const connectDB = require('./config/db');
 
 //Load environment vars
 dotenv.config({ path: './config/config.env' });
+
+//Connect to MongoDB
+connectDB();
+
+//Route Files
+const bootcamps = require('./routes/bootcamps.js');
 
 const PORT = process.env.PORT || 5000;
 
@@ -22,6 +25,14 @@ if (process.env.NODE_ENV === 'development') {
 //Mount Routers
 app.use('/api/v1/bootcamps', bootcamps);
 
-app.listen(PORT, () => {
+//Start the server
+const server = app.listen(PORT, () => {
   console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}...Happy Hacking!!`);
+});
+
+//Handle unhandled promise rejections
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  //Close server and exit process
+  server.close(() => process.exit(1));
 });
